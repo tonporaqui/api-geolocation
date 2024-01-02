@@ -1,0 +1,22 @@
+# Dockerfile-prod
+FROM node:18
+
+WORKDIR /user/src/app
+
+# Copia el archivo package.json y pnpm-lock.yaml
+COPY package*.json pnpm-lock.yaml ./
+
+# Instala las dependencias usando pnpm
+RUN npm install -g pnpm && pnpm install --frozen-lockfile --prod
+
+# Copia el resto de los archivos del proyecto
+COPY . .
+
+# Construye la aplicación
+RUN pnpm run build
+
+# Expone el puerto 3000 (o el que tu aplicación utilice)
+EXPOSE 3000
+
+# Comando para iniciar la aplicación
+CMD [ "pnpm", "run", "start:prod" ]
