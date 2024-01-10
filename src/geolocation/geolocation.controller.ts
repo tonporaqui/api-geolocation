@@ -1,14 +1,21 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import * as geoip from 'geoip-lite';
+import { Controller, Get, Query } from '@nestjs/common'
+import { GeolocationService } from './geolocation.service'
 
 @Controller('geolocation')
 export class GeolocationController {
-  @Get()
-  getGeoLocation(@Query('ip') ip: string) {
-    const geo = geoip.lookup(ip);
-    if (!geo) {
-      return { error: 'ip not found' };
-    }
-    return geo;
-  }
+	constructor(private geolocationService: GeolocationService) {}
+
+	@Get()
+	async getGeoLocation(@Query('ip') ip: string) {
+		try {
+			const geo = await this.geolocationService.getGeoLocation(ip)
+			if (!geo) {
+				return { error: 'IP not found' }
+			}
+			return geo
+		} catch (error) {
+			console.error(error)
+			return { error: 'Error processing the IP address' }
+		}
+	}
 }
